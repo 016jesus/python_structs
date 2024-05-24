@@ -13,21 +13,21 @@ from constants import style
 with open(style.file, "rb") as file:
     graph = pickle.load(file)
 
-# Crear figura y ejes para el grafo
+# crear figura y ejes para el grafo
 fig, ax = ox.plot_graph(
-    graph,        # El grafo a mostrar
-    show=False,   # No mostrar ventana
-    close=False,  # No cerrar el gráfico
+    graph,        # el grafo a mostrar
+    show=False,   # no mostrar ventana
+    close=False,  # no cerrar el gráfico
     edge_color=style.edge_color,
     edge_alpha=0.3,
     node_size=0,
     bgcolor=style.verdelimaOscuro
 )
 
-# Ventana principal
+# ventana principal
 window = Manager()
 
-# Frame principal
+# frame principal
 app = createFrame(
     window,
     relh=1,
@@ -43,7 +43,7 @@ frame_1.place(
     relheight=0.5,
 )
 
-# Función para obtener coordenadas de una dirección
+# funcion para obtener coordenadas de una dirección
 def get_coordinates(address):
     geolocator = Nominatim(user_agent="elpapu")
     location = geolocator.geocode(address)
@@ -52,7 +52,7 @@ def get_coordinates(address):
     else:
         return None
 
-# Función para actualizar el mapa en el canvas
+# funcion para actualizar el mapa en el canvas
 def actualizarMapa(frame):
     canva = FigureCanvasTkAgg(fig, master=frame)
     canva.draw()
@@ -60,7 +60,7 @@ def actualizarMapa(frame):
     canva.get_tk_widget().pack(fill=tk.BOTH, expand=True)
     return canva    
 
-# Canvas que contiene el mapa
+# canvas que contiene el mapa
 canva = actualizarMapa(frame_1)
 
 # Función para ejecutar cuando se presiona el botón "Encontrar"
