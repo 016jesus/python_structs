@@ -1,15 +1,10 @@
-import osmnx as ox
-import pickle
-import tkinter as tk
 from matplotlib.backends.backend_tkagg import FigureCanvasTkAgg
 from geopy.geocoders import Nominatim
-import time
 from scenes import *
 from Manager import *
-# Suponiendo que style es un módulo con tus configuraciones de estilo
 from constants import style
 
-# Cargar el grafo desde el archivo
+# cargar el grafo desde el archivo
 with open(style.file, "rb") as file:
     graph = pickle.load(file)
 
@@ -17,15 +12,17 @@ with open(style.file, "rb") as file:
 fig, ax = ox.plot_graph(
     graph,        # el grafo a mostrar
     show=False,   # no mostrar ventana
-    close=False,  # no cerrar el gráfico
+    close=False,  # no cerrar el grafico
     edge_color=style.edge_color,
     edge_alpha=0.3,
     node_size=0,
-    bgcolor=style.verdelimaOscuro
+    dpi = 0,
+    bgcolor=style.backgroundColor
 )
 
 # ventana principal
 window = Manager()
+fig.subplots_adjust(left=0, bottom=0, right=1, top=1, wspace=0, hspace=0)
 
 # frame principal
 app = createFrame(
@@ -35,12 +32,12 @@ app = createFrame(
 )
 
 # Frame del mapa
-frame_1 = tk.Frame(app, background=style.verdelimaOscuro)
+frame_1 = tk.Frame(app, background=style.backgroundColor)
 frame_1.place(
     relx=0,  # Frame en el lado izquierdo
-    rely=0,
-    relwidth=0.5,  # Ancho relativo
-    relheight=0.5,
+    rely=0.1,
+    relwidth=0.7,  # Ancho relativo
+    relheight=0.9
 )
 
 # funcion para obtener coordenadas de una dirección
@@ -56,9 +53,9 @@ def get_coordinates(address):
 def actualizarMapa(frame):
     canva = FigureCanvasTkAgg(fig, master=frame)
     canva.draw()
-    canva.get_tk_widget().config(bg=style.verdelimaOscuro, cursor="cross")
+    canva.get_tk_widget().config(bg=style.backgroundColor, cursor="cross")
     canva.get_tk_widget().pack(fill=tk.BOTH, expand=True)
-    return canva    
+    return canva   
 
 # canvas que contiene el mapa
 canva = actualizarMapa(frame_1)
@@ -79,14 +76,14 @@ def ejecutAlg():
         ax.plot(node_x, node_y, 'ro', markersize=2)
         actualizarMapa(frame_1)  # Actualizar el canvas con el nuevo punto
     else:
-        print("No se encontró la dirección")
+        print("No se encontro la direccion")
 
 # Frame del texto debajo del mapa
 frame_2 = createFrame(
     app,
     xrel=0,
-    yrel=0.5,
-    relw=0.5,
+    yrel=0,
+    relw=1,
     relh=0.1,
     cursor="xterm"
 )
@@ -95,8 +92,9 @@ frame_2 = createFrame(
 texto = tk.Text(
     master=frame_2,
     font=style.font,
-    background=style.verdelimaOscuro,
-    fg="white"
+    
+    background=style.main,
+    fg="black"
 )
 texto.pack(
     fill=tk.BOTH,
@@ -108,18 +106,19 @@ texto.config(state=tk.DISABLED)
 # Frame del campo (input) de texto y botón
 frame_3 = createFrame(
     app,
-    xrel=0.5,
-    relh=0.5,
+    xrel=0.7,
+    yrel=0.1,
+    relh=0.9,
     relw=0.3,
     bgcolor=style.backgroundColor
 )
 
 # Campo de entrada de texto
-campo_texto = tk.Entry(frame_3)
+campo_texto = tk.Entry(frame_3, relief="groove")
 campo_texto.place(
-    relx=0.5,
+    relx=0.4,
     rely=0.05,
-    relheight=0.075,
+    relheight=0.05,
     width=400
 )
 
@@ -129,7 +128,7 @@ btn = createButton(
     accion=ejecutAlg,
     texto="Encontrar",
     xrel=0.65,
-    yrel=0.125
+    yrel=0.1
 )
 
 # Frame inferior para posibles futuros usos
@@ -138,14 +137,23 @@ frame_4 = createFrame(
     xrel=0,
     yrel=0.95,
     relw=1,
-    relh=0.08,
+    relh=0.05,
     bgcolor="white",
 )
 
-# Función para redimensionar el canvas
+# Funcion para redimensionar el canvas
 def resize_canvas(event):
     canva.get_tk_widget().config(width=event.width, height=event.height)
     canva.draw()
+
+def on_zoom(event):
+
+    
+    canva.draw_idle()  # Actualizar el canvas
+
+# Conectar el evento de zoom al manejador de eventos
+
+
 
 frame_1.bind('<Configure>', resize_canvas)
 
