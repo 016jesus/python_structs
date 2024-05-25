@@ -4,7 +4,7 @@ import osmnx as ox
 import matplotlib.pyplot as plt
 from constants import style
 import pickle
-import pandas as pd
+
 from geopandas import *
 from geopy.geocoders import Nominatim
 
@@ -46,7 +46,7 @@ def createButton(
 
 def createFrame(
     parent,
-    bgcolor = style.verdelimaOscuro,
+    bgcolor = style.main,
     xrel = 0.,
     yrel = 0.,
     relw = 0.,
@@ -65,3 +65,24 @@ def createFrame(
     relheight=relh,
     )
     return f
+
+
+
+class CanvasZoom(tk.Canvas):
+    def __init__(self, master , img, **kwargs):
+        super().__init__(master, **kwargs)
+        self.img = img
+        self.img_id = self.create_image(0, 0, anchor=tk.NW, image=self.img)
+        self.scale_factor = 1.0
+        self.bind("<MouseWheel>", self.zoom)
+        self.bind("<Button-1>", self.start_pan)
+        self.bind("<B1-Motion>", self.pan)
+    
+    def zoom(self, event):
+        scale = 1.0
+        if event.delta > 0:
+            scale*=1.1
+        elif event.delta < 0:
+            scale/=1.1
+        self.scale_factor = scale
+        self.scale("all", event.x, event.y, scale, scale)
